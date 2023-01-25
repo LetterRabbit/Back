@@ -1,6 +1,11 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from routers import users
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from core.database import Base, engine
+import uvicorn
+
 app = FastAPI()
 '''
 CORS
@@ -14,3 +19,15 @@ app.add_middleware(
 )
 
 app.include_router(users.router)
+
+@app.get("/database",
+         description = "This is a database creation confirmation API. \
+             If there is no database table that references the model, it is created."
+         )
+async def root():
+    Base.metadata.create_all(bind=engine)
+    return {"message" : "find database"}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8000)
