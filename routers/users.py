@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from api.user.login import greeting_user
+from api.user.login import get_token_data
 
 
 router = APIRouter(
@@ -7,6 +7,7 @@ router = APIRouter(
     tags=["users"],
 )
 
-@router.get("/hello")
-async def HelloUser():
-    return greeting_user()
+@router.get("/login")
+async def LoginUser():
+    a = get_token_data()
+    return a
