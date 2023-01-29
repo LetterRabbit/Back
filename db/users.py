@@ -1,5 +1,7 @@
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, func
 from core.database import Base
+from sqlalchemy.orm import *
+from db.mailbox import *
 
 class User(Base):
     __tablename__ = "users"
@@ -13,3 +15,5 @@ class User(Base):
     is_activate = Column(Boolean, default = True)
     created_at = Column(DateTime, default=func.utc_timestamp())
     updated_at = Column(DateTime, default=func.utc_timestamp(), onupdate=func.utc_timestamp())
+    # 편지함과 1:1 관계 설정값
+    mailbox = relationship("MailBox", back_populates = 'mailboxes')
