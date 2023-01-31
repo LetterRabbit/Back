@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Request, Response, Header
-from api.user.login import get_token_data
-
+from fastapi import APIRouter, Request, Response, Header, Depends
+from api.user.login import get_token_data, gretting_user
+from sqlalchemy.orm import Session
 from typing import Optional
 
 router = APIRouter(

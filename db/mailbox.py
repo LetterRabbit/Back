@@ -1,13 +1,12 @@
 from sqlalchemy import *
 from sqlalchemy.orm import *
 from core.database import Base
-from db.users import User
 
 class MailBox(Base):
     __tablename__ = "mailboxes"
         
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user = relationship(User, back_populates = 'mailboxes')
+    user = relationship('users.User', back_populates = 'mailboxes')
     user_id = Column(Integer, ForeignKey("users.id"))
     mailbox_position = relationship("MailBoxPosition", back_populates = 'mailboxes')
     mailbox_position_id = Column(Integer, ForeignKey("mailbox_positions.id"))
