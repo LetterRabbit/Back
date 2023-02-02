@@ -27,13 +27,3 @@ def get_token_data(authCode):
     response = requests.get(url+authCode)
     user_info = response.json()
     return user_info
-
-
-# def login_user(
-#     user_create : users.UserCreate,
-#     db : Session = Depends(get_db)
-# ):
-#     return "Hello User"
-
-
-# print()
