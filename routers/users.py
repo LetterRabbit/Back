@@ -24,8 +24,8 @@ async def LoginUser(
             gender = user_create["gender"],
             age_range = user_create["age_range"]
         )
-        create_user(db = db, user = user)
-        return 0
+        token = create_user(db = db, user = user)
+        return token
     
     except Exception as e:
         print(str(e))
