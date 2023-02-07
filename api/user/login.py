@@ -71,9 +71,7 @@ def create_user(db : Session, user : user_schemas.UserCreate):
         db.commit()
         db.refresh(db_user)
         token = create_access_token(data=user.__dict__)
-        print(token)
         return token
     else:
         token = create_access_token(data=user.__dict__)
-        print(token)
         return token

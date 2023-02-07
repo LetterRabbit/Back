@@ -16,4 +16,4 @@ class User(Base):
     created_at = Column(DateTime, default=func.utc_timestamp())
     updated_at = Column(DateTime, default=func.utc_timestamp(), onupdate=func.utc_timestamp())
     # 편지함과 1:1 관계 설정값
-    # mailbox = relationship("MailBox", back_populates = 'mailboxes')
+    # mailbox = relationship("mailbox.MailBox", back_populates = 'mailboxes')
