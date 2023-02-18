@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, func
 from core.database import Base
 from sqlalchemy.orm import *
-from models.mailbox import *
+
 
 class User(Base):
     __tablename__ = "users"
@@ -16,4 +16,4 @@ class User(Base):
     created_at = Column(DateTime, default=func.utc_timestamp())
     updated_at = Column(DateTime, default=func.utc_timestamp(), onupdate=func.utc_timestamp())
     # 편지함과 1:1 관계 설정값
-    # mailbox = relationship("mailbox.MailBox", back_populates = 'mailboxes')
+    # my_mailbox = relationship("mailbox.MailBox", back_populates = 'owner')

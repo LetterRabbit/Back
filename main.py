@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from routers import users
+from routers import users, mailboxes
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import Base, engine
@@ -18,7 +18,10 @@ app.add_middleware(
     allow_headers = ["*"]
 )
 
+
 app.include_router(users.router)
+# 수훈 작업 라우터
+app.include_router(mailboxes.router)
 
 @app.get("/database",
          description = "This is a database creation confirmation API. \
