@@ -1,7 +1,7 @@
 import requests, json, os, uuid
 from fastapi import Depends, HTTPException, status
 from core.database import get_db
-from models.mailbox  import MailBox
+from models.models  import MailBox
 from schemas import mailbox_schemas
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv

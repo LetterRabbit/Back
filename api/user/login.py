@@ -1,7 +1,7 @@
 import requests, json, os
 from fastapi import Depends, HTTPException, status
 from core.database import get_db
-from models.users  import User
+from models.models  import User
 from schemas import user_schemas
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
