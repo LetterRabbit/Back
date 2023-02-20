@@ -11,13 +11,13 @@ router = APIRouter(
 
 @router.get("/check")
 async def CheckGet():
-    print('activate')
-    return {"message" : "hello suhun"}
+    print('mailbox activate')
+    return {"message" : "mailbox activate"}
 
-@router.post("/create-test")
+@router.post("/create")
 async def CreateMailboxAddress(
     db : Session = Depends(database.get_db), data : MailboxBase = Request.body):
-    print('active - CreateMailboxAddress')
+    print('active - CreateMailbox')
     
     mailbox_data = MailboxBase(
         owner_id = data.owner_id,

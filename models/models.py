@@ -27,6 +27,7 @@ class MailBox(Base):
     mailbox_position_id = Column(Integer, ForeignKey("mailbox_positions.id"), nullable = True)
     # address 는 uuid4 들어가는곳
     address             = Column(String(200), nullable = False)
+    name                = Column(String(200), nullable = False)
     created_at          = Column(DateTime, default=func.utc_timestamp())
     updated_at          = Column(DateTime, default=func.utc_timestamp(), onupdate=func.utc_timestamp())
 

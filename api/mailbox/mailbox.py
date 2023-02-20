@@ -9,11 +9,10 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
 def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase ):
-    print('create_my_mailbox')
+    print('create_my_mailbox 작동')
     owner_id = mailbox_data.owner_id
-    print(owner_id)
     mailbox_position_id = mailbox_data.mailbox_position_id
-    print(mailbox_position_id)
+    
     # 주소는 uuid4 사용.
     address = str(uuid.uuid4())
     
