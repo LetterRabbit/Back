@@ -75,3 +75,4 @@ def create_user(db : Session, user : user_schemas.UserCreate):
     else:
         token = create_access_token(data=user.__dict__)
         return token
+    
