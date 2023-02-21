@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Response, Header, Depends
+from fastapi import APIRouter, Request, Response, Header, Depends, status
 from sqlalchemy.orm import Session
 from api.mailbox.mailbox import create_my_mailbox
 from typing import Optional
@@ -11,20 +11,18 @@ router = APIRouter(
 
 @router.get("/check")
 async def CheckGet():
-    print('activate')
-    return {"message" : "hello suhun"}
+    print('mailbox activate')
+    return {"message" : "mailbox activate"}
 
-@router.post("/create-test")
-async def CreateMailboxAddress(
+@router.post("/create", status_code= status.HTTP_201_CREATED)
+async def CreateMailbox(
     db : Session = Depends(database.get_db), data : MailboxBase = Request.body):
-    print('active - CreateMailboxAddress')
     
     mailbox_data = MailboxBase(
         owner_id = data.owner_id,
-        mailbox_position_id = data.mailbox_position_id
+        mailbox_position_id = data.mailbox_position_id,
+        name = data.name
     )
-    print('mailbox_data')
-    print(mailbox_data)
     create_my_mailbox(db = db, mailbox_data = mailbox_data)
     
-    return {"message" : "check DB"}
+    return {"message" : "new mailbox created"}

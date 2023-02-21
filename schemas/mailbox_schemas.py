@@ -4,6 +4,7 @@ from typing import List, Optional
 class MailboxBase(BaseModel): 
     owner_id : int
     mailbox_position_id : int
+    name : str
     
 
 class MailboxCreate(MailboxBase):
