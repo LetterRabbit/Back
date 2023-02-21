@@ -18,7 +18,7 @@ class User(Base):
     created_at = Column(DateTime, default=func.utc_timestamp())
     updated_at = Column(DateTime, default=func.utc_timestamp(), onupdate=func.utc_timestamp())
 
-    my_mailbox = relationship("MailBox", back_populates = 'owner_id')
+    my_mailbox = relationship("MailBox", back_populates = 'owner')
 
 class MailBox(Base):
     __tablename__ = "mailboxes"
@@ -33,7 +33,7 @@ class MailBox(Base):
 
     owner               = relationship("User", back_populates = 'my_mailbox')
     position            = relationship("MailBoxPosition", back_populates = 'target_box')
-    from_letters        = relationship("Letter", back_populates = 'mailbox_id')
+    from_letters        = relationship("Letter", back_populates = 'to_mailbox')
 
 class MailBoxPosition(Base):
     __tablename__ = "mailbox_positions"
