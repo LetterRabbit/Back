@@ -15,7 +15,7 @@ async def CheckGet():
     return {"message" : "mailbox activate"}
 
 @router.post("/create")
-async def CreateMailboxAddress(
+async def CreateMailbox(
     db : Session = Depends(database.get_db), data : MailboxBase = Request.body):
     print('active - CreateMailbox')
     print(data)
