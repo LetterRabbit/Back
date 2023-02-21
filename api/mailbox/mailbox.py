@@ -42,5 +42,5 @@ def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase )
         db.commit()
         db.refresh(new_mailbox)
 
-    except Exception:
-        raise HTTPException(status_code=404, detail= "Key value that does not exist.")
+    except Exception as e :
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "Key value that does not exist." + str(e))
