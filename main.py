@@ -7,6 +7,7 @@ from core.database import Base, engine
 import uvicorn
 
 app = FastAPI()
+app.router.redirect_slashes = False
 '''
 CORS
 '''

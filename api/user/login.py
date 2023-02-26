@@ -8,9 +8,12 @@ from dotenv import load_dotenv
 from jose import jwt
 from datetime import datetime, timedelta
 
+
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 secretkey = os.getenv("SECRET_KEY")
 algorithm = os.getenv("ALGORITHM")
+REDIRECT_URI = "http://localhost:8000/users/callback"
+
 
 def connect_kakao_server(authCode):
     url = "https://kauth.kakao.com/oauth/token"
@@ -40,7 +43,6 @@ def create_access_token(data : dict, expires_delta : timedelta or None = None):
 
 def get_token_data(authCode):
     res = connect_kakao_server(authCode)
-    
     user_data = res['access_token']
     token_type = res['token_type']
     url = 'https://kapi.kakao.com/v2/user/me'
@@ -76,3 +78,21 @@ def create_user(db : Session, user : user_schemas.UserCreate):
         token = create_access_token(data=user.__dict__)
         return token
     
+def get_dev_token_data(authCode):
+    # res = connect_kakao_server(authCode)
+    user_data = authCode
+    token_type = "Bearer"
+    url = 'https://kapi.kakao.com/v2/user/me'
+    header = {
+        "Authorization" : token_type + " " + user_data
+    }
+    response = requests.get(url = url, headers=header)
+    user_info = response.json()
+    data = {
+        "username" : user_info['kakao_account']['profile']['nickname'],
+        "email" : user_info['kakao_account']['email'],
+        "gender" : user_info['kakao_account']['gender'],
+        "age_range" : user_info['kakao_account']['age_range'],
+        "birthday" : user_info['kakao_account']['birthday']
+    }
+    return data
