@@ -46,7 +46,7 @@ def write_my_letter(db : Session, letter_data : letter_schemas.WriteLetter ):
     
     new_letter = Letter(
         mailbox_id = mailbox_id,
-        username = letter_data.username,
+        username = username,
         description = letter_data.description
     )
 
