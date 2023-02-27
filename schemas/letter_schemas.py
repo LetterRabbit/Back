@@ -8,9 +8,9 @@ class LetterBase(BaseModel):
 
 class WriteLetter(BaseModel):
     address : str
-    username : int
+    username : str
     description : str
 
 class RequestLetter(BaseModel):
-    username : int
+    username : str
     description : str

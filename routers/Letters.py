@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 @router.get("/check")
-async def CheckGet():
+async def CheckGet2():
     print('letter activate')
     return {"message" : "letter activate"}
 
