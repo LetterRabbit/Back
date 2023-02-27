@@ -23,9 +23,8 @@ class User(Base):
 class MailBox(Base):
     __tablename__ = "mailboxes"
     id                  = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    owner_id            = Column(Integer, ForeignKey("users.id"))
+    owner_id            = Column(Integer, ForeignKey("users.id"), unique = True)
     mailbox_position_id = Column(Integer, ForeignKey("mailbox_positions.id"), nullable = True)
-    # address 는 uuid4 들어가는곳
     address             = Column(String(200), nullable = False)
     name                = Column(String(200), nullable = False)
     created_at          = Column(DateTime, default=func.utc_timestamp())
