@@ -58,10 +58,11 @@ def get_token_data(authCode):
         "age_range" : user_info['kakao_account']['age_range'],
         "birthday" : user_info['kakao_account']['birthday']
     }
+
     return data
 
 def create_user(db : Session, user : user_schemas.UserCreate):
-    if not db.query(User).filter(User.email == user.email).first():
+    if db.query(User).filter(User.email == user.email).first() is None:
         db_user = User(
             username = user.username,
             email = user.email,
@@ -72,14 +73,24 @@ def create_user(db : Session, user : user_schemas.UserCreate):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        token = create_access_token(data=user.__dict__)
+        
+        data = db.query(User).filter(User.email == user.email).first()
+        token_data = {
+            "id" : data.id,
+            "username" : data.username,
+        }
+        token = create_access_token(data=token_data)
         return token
     else:
-        token = create_access_token(data=user.__dict__)
+        data = db.query(User).filter(User.email == user.email).first()
+        token_data = {
+            "id" : data.id,
+            "username" : data.username,
+        }
+        token = create_access_token(data=token_data)
         return token
     
 def get_dev_token_data(authCode):
-    # res = connect_kakao_server(authCode)
     user_data = authCode
     token_type = "Bearer"
     url = 'https://kapi.kakao.com/v2/user/me'
