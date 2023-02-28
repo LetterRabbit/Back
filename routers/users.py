@@ -1,6 +1,7 @@
 import requests,os
 from fastapi import APIRouter, Request, Response, HTTPException, Header, Depends,Cookie, status
 from api.user.login import create_user,get_token_data, get_dev_token_data, create_access_token
+from api.user.qr import generate_qrcode, save_aws_s3
 from core.decoration import get_user_from_jwt
 from sqlalchemy.orm import Session
 from core import database
@@ -96,6 +97,29 @@ async def check_user_data(
 ):
     token = request.headers.get('access_token')
     user_info = get_user_from_jwt(token, db=db)
-    
 
     return user_info
+
+@router.get('/qr')
+async def check_user_qr(
+    request : Request,
+    db : Session = Depends(database.get_db)
+    ):
+    try:
+        token = request.headers.get('access_token')
+        user_info = get_user_from_jwt(token, db=db)
+        data = db.query(models.MailBox).filter(models.MailBox.owner_id == user_info.id).first()
+        url = f"{request.base_url}/mailbox/{data.address}"
+        qr_image = generate_qrcode(url)
+        url_qr = save_aws_s3(qr_image, user_info.username)
+        db_address = models.User(self_domain = url ,qr_image = url_qr)
+        db.add(db_address)
+        db.commit()
+        db.refresh(db_address)
+        return url_qr
+
+    except Exception as e:
+        return HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+             detail=str(e)
+        )
