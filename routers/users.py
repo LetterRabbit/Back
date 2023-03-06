@@ -1,13 +1,15 @@
-import requests,os
+import requests
+import os
 from fastapi import APIRouter, Request, Response, HTTPException, Header, Depends,Cookie, status
-from api.user.login import create_user,get_token_data, get_dev_token_data, create_access_token
+from api.user.login import create_user,get_token_data, get_dev_token_data
+from api.user.qr import save_aws_s3
+from fastapi.responses import JSONResponse
 from core.decoration import get_user_from_jwt
 from sqlalchemy.orm import Session
+from sqlalchemy import MetaData, Table
 from core import database
 from typing import Optional
 from schemas import user_schemas
-from fastapi.responses import RedirectResponse
-from urllib.parse import urlparse, parse_qs
 from models import models
 
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
@@ -96,6 +98,27 @@ async def check_user_data(
 ):
     token = request.headers.get('access_token')
     user_info = get_user_from_jwt(token, db=db)
-    
 
     return user_info
+
+@router.get('/qr')
+async def check_user_qr(
+    request : Request,
+    db : Session = Depends(database.get_db)
+    ):
+    try:
+        token = request.headers.get('access_token')
+        user_info = get_user_from_jwt(token, db=db)
+        data = db.query(models.MailBox).filter(models.MailBox.owner_id == user_info.id).first()
+        url = f"{request.base_url}mailbox/{data.address}"
+        url_qr = save_aws_s3(url, user_info.id)
+        mytable = Table('users', MetaData(), autoload=True, autoload_with=database.engine)
+        qr =mytable.update().where(mytable.c.id == user_info.id).values(self_domain = url, qr_code = url_qr)
+        database.engine.execute(qr)
+        return JSONResponse(content={"self_domain" : user_info.self_domain, "qr_domain" : user_info.qr_code}, status_code=201)
+
+    except Exception as e:
+        return HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+             detail=str(e)
+        )

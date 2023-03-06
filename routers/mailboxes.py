@@ -16,7 +16,9 @@ async def CheckGet():
 
 @router.post("/create", status_code= status.HTTP_201_CREATED)
 async def CreateMailbox(
-    db : Session = Depends(database.get_db), data : MailboxBase = Request.body):
+    db : Session = Depends(database.get_db), 
+    data : MailboxBase = Request.body
+    ):
     
     mailbox_data = MailboxBase(
         owner_id = data.owner_id,
