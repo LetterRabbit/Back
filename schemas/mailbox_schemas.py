@@ -10,3 +10,6 @@ class MailboxBase(BaseModel):
 class MailboxCreate(MailboxBase):
     address : str
 
+class CreateMailbox(BaseModel):
+    mailbox_position_id : int
+    name : str
