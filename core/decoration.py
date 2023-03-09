@@ -17,14 +17,9 @@ def get_user_from_jwt(access_token, db : Session):
         return data
     
     except ExpiredSignatureError:
-        return HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail= str(e)                 )
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= str(e))
     except Exception as e:
-        return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(e)
-        )
+        return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
     
 
 
