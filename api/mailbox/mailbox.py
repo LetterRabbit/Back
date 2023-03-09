@@ -1,6 +1,6 @@
 import requests, json, os, uuid
 from fastapi import Depends, HTTPException, status
-from models.models  import MailBox
+from models.models  import MailBox, Letter
 from schemas import mailbox_schemas
 from sqlalchemy.orm import Session
 from models.models import User, MailBoxPosition
@@ -44,3 +44,29 @@ def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase )
 
     except Exception as e :
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "Key value that does not exist." + str(e))
+    
+def open_my_mailbox(db : Session, data):
+    print('open_my_mailbox 작동')
+    try:
+        user_id = data.id
+        target_mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).scalar()
+        letters = db.query(Letter.id, Letter.username, Letter.description, Letter.created_at).filter(Letter.mailbox_id == target_mailbox_id).all()
+        
+        return letters
+    except Exception as e :
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
+    
+def open_my_letter(db : Session, data, letter_id):
+    try:
+        user_id = data.id
+        target_mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).scalar()
+        letters = db.query(Letter.id, Letter.username, Letter.description, Letter.created_at).filter(
+            Letter.id == letter_id,
+            Letter.mailbox_id == target_mailbox_id
+            ).one()
+        
+        return letters
+    except NoResultFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "NoResultFound " +": " + str(e))
+    except Exception as e :
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
