@@ -111,10 +111,10 @@ async def check_user_qr(
         user_info = get_user_from_jwt(token, db=db)
         data = db.query(models.MailBox).filter(models.MailBox.owner_id == user_info.id).first()
         url = f"{request.base_url}mailbox/{data.address}"
-        url_qr = await save_aws_s3(url, user_info.id)
+        url_qr = save_aws_s3(url, user_info.id)
         mytable = Table('users', MetaData(), autoload=True, autoload_with=database.engine)
-        qr = await mytable.update().where(mytable.c.id == user_info.id).values(self_domain = url, qr_code = url_qr)
-        await database.engine.execute(qr)
+        qr = mytable.update().where(mytable.c.id == user_info.id).values(self_domain = url, qr_code = url_qr)
+        database.engine.execute(qr)
         return JSONResponse(content={"self_domain" : user_info.self_domain, "qr_domain" : user_info.qr_code}, status_code=201)
 
     except Exception as e:
