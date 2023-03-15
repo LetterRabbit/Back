@@ -3,7 +3,7 @@ from sqlalchemy.orm         import Session
 from api.mailbox.mailbox    import create_my_mailbox, open_my_mailbox, open_my_letter
 from core.decoration        import get_user_from_jwt
 from core                   import database
-from schemas.mailbox_schemas import MailboxBase
+from schemas.mailbox_schemas import MailboxBase, MailboxCreate
 
 router = APIRouter(
     prefix="/mailbox",
@@ -19,7 +19,7 @@ async def CheckGet():
 async def CreateMailbox(
     request : Request,
     db : Session = Depends(database.get_db), 
-    data : CreateMailbox = Request.body
+    data : MailboxCreate = Request.body
     ):
 
     token = request.headers.get('access_token')
