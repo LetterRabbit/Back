@@ -25,6 +25,11 @@ def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase )
         # 주소는 uuid4 사용.
         address = str(uuid.uuid4())
 
+        # 편지함 중복생성 방지.
+
+        if db.query(MailBox).filter(MailBox.owner_id == owner_id).exists():
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= "The mailbox already exists." + str(e))
+
         # 편지함 이름
         if mailbox_data.name == "":
             name = owner_q.first().username

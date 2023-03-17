@@ -16,8 +16,8 @@ def get_user_from_jwt(access_token, db : Session):
         print('decode 확인')
         print(data)
         # print(data)
-        # if db.query(models.User).filter(models.User.id == data['id']).first() is None:
-        #     raise Exception
+        if db.query(models.User).filter(models.User.id == data['id']).first() is None:
+            raise Exception
         user = db.query(models.User).filter(models.User.id == data['id']).first()
         print(user)
         return user
