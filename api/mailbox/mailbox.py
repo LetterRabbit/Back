@@ -1,9 +1,8 @@
 import requests, json, os, uuid
 from fastapi import Depends, HTTPException, status
-from models.models  import MailBox, Letter
 from schemas import mailbox_schemas
 from sqlalchemy.orm import Session
-from models.models import User, MailBoxPosition
+from models.models import User, MailBoxPosition, Letter, MailBox
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -12,32 +11,30 @@ def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase )
 
     try:
         # 쿼리문으로 데이터 베이스 조회(User, MailBoxPosition)
-        owner_q = db.query(User).filter(User.id == mailbox_data.owner_id)
-        if not owner_q.first():
-            raise Exception 
-        owner_id = mailbox_data.owner_id
+        target_user = db.query(User).filter(User.id == mailbox_data.owner_id).first()
+        if not target_user:
+            raise KeyError 
+        user_id = mailbox_data.owner_id
 
-        mailbox_position_q = db.query(MailBoxPosition).filter(MailBoxPosition.id == mailbox_data.mailbox_position_id)
-        if not mailbox_position_q.first():
-            raise Exception
+        if not db.query(MailBoxPosition).filter(MailBoxPosition.id == mailbox_data.mailbox_position_id).first():
+            raise KeyError
         mailbox_position_id = mailbox_data.mailbox_position_id
         
+        # 편지함 중복생성 방지.
+        if db.query(MailBox).filter(MailBox.owner_id == user_id).first() is not None:
+            raise KeyError
+
         # 주소는 uuid4 사용.
         address = str(uuid.uuid4())
 
-        # 편지함 중복생성 방지.
-
-        if db.query(MailBox).filter(MailBox.owner_id == owner_id).exists():
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= "The mailbox already exists." + str(e))
-
         # 편지함 이름
         if mailbox_data.name == "":
-            name = owner_q.first().username
+            name = target_user.username
         else:
             name = mailbox_data.name
 
         new_mailbox = MailBox(
-            owner_id = owner_id,
+            owner_id = user_id,
             mailbox_position_id = mailbox_position_id,
             address = address,
             name = name
@@ -47,8 +44,10 @@ def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase )
         db.commit()
         db.refresh(new_mailbox)
 
-    except Exception as e :
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "Key value that does not exist." + str(e))
+    except KeyError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= "Key value that does not exist.")
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "[create_my_mailbox error] : "+ str(e))
     
 def open_my_mailbox(db : Session, data):
     print('open_my_mailbox 작동')
