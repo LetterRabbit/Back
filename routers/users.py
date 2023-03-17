@@ -42,7 +42,7 @@ async def LoginUser(
         token = create_user(db = db, user = user)
         response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
         return token
-
+        
     except Exception as e:
         return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -27,7 +27,9 @@ def connect_kakao_server(authCode):
         }
     a = requests.post(url=url, headers=header,data=data)
     res = a.json()
-
+    # 이 부분 에러처리 해야 할 것 같습니다.
+    #{'error': 'invalid_grant', 'error_description': 'authorization code not found for code=1ve98o4V2AGKn9pvV-fwRMxDygNBmnafHJ_FOc3hCiolUAAAAYbvbcrM', 'error_code': 'KOE320'}
+    # res 값 안에 error 가 있을 경우로 try, catch 한뒤 error_discription을 raise HTTP Exception에 태워 보내면 될 것 같아요.
     return res
 
 def create_access_token(data : dict, expires_delta : timedelta or None = None):
