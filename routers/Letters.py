@@ -28,4 +28,4 @@ async def CreateMailbox(
     
     write_my_letter(db= db, letter_data= letter_data)
     
-    return {"message" : "new mailbox created"}
+    return {"message" : "new letter created"}
