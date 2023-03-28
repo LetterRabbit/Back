@@ -28,15 +28,11 @@ def connect_kakao_server(authCode):
             }
         a = requests.post(url=url, headers=header,data=data)
         res = a.json()
-        if not res['error_code'] is None:
-            message = f"error_description : {res['error_description']}, error_code : {res['error_code']}"
-            status_code = res["error_code"]
-            raise Exception
         return res
     except Exception as e:
         return HTTPException(
-            status_code=status_code,
-            detail=message
+            status_code=400,
+            detail=str(e)
         )
 
 def create_access_token(data : dict, expires_delta : timedelta or None = None):

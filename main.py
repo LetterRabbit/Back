@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from routers import users, mailboxes, Letters
-from fastapi import FastAPI, Depends
-from fastapi.middleware.cors import CORSMiddleware
 from core.database import Base, engine
 import uvicorn
+from starlette.middleware.cors import CORSMiddleware as CORSMiddleware
+
 
 app = FastAPI()
 app.router.redirect_slashes = False
@@ -20,7 +20,7 @@ app.add_middleware(
     allow_origins = ["*"],
     allow_credentials = True,
     allow_methods= ["*"],
-    allow_headers = ["*"]
+    allow_headers = ["*"],
 )
 
 
@@ -39,4 +39,4 @@ async def root():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

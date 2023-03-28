@@ -29,7 +29,7 @@ async def LoginUser(
     request : Request,
     db : Session = Depends(database.get_db),
 ):
-   # try:
+   try:
     authCode = request.headers.get("authCode")
     user_create = get_token_data(authCode)
     user = user_schemas.UserCreate(
@@ -39,16 +39,16 @@ async def LoginUser(
         gender = user_create["gender"],
         age_range = user_create["age_range"]
     )
-    print(1)
     token = create_user(db = db, user = user)
     response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
-    return token
-        
-   # except Exception as e:
-    #    return HTTPException(
-     #       status_code=401,
-      #      detail=str(e)
-       # )  
+    response.headers["Access-Control-Allow-Credentials"] = "*"
+    return JSONResponse(content={"access_token" : token}, status_code=200)
+
+   except Exception as e:
+       return HTTPException(
+           status_code=401,
+           detail=str(e)
+       )  
     
 @router.post('/logout')
 async def logout(
