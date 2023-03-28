@@ -11,6 +11,10 @@ app.router.redirect_slashes = False
 '''
 CORS
 '''
+origins = [
+    "*"
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins = ["*"],
