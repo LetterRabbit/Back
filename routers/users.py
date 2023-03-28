@@ -29,25 +29,26 @@ async def LoginUser(
     request : Request,
     db : Session = Depends(database.get_db),
 ):
-    try:
-        authCode = request.headers.get("authCode")
-        user_create = get_token_data(authCode)
-        user = user_schemas.UserCreate(
-            username = user_create["username"],
-            email = user_create["email"],
-            birthday = user_create["birthday"],
-            gender = user_create["gender"],
-            age_range = user_create["age_range"]
-        )
-        token = create_user(db = db, user = user)
-        response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
-        return token
+   # try:
+    authCode = request.headers.get("authCode")
+    user_create = get_token_data(authCode)
+    user = user_schemas.UserCreate(
+        username = user_create["username"],
+        email = user_create["email"],
+        birthday = user_create["birthday"],
+        gender = user_create["gender"],
+        age_range = user_create["age_range"]
+    )
+    print(1)
+    token = create_user(db = db, user = user)
+    response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
+    return token
         
-    except Exception as e:
-        return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-             detail=str(e)
-        )  
+   # except Exception as e:
+    #    return HTTPException(
+     #       status_code=401,
+      #      detail=str(e)
+       # )  
     
 @router.post('/logout')
 async def logout(
