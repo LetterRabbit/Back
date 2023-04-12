@@ -12,12 +12,14 @@ app.router.redirect_slashes = False
 CORS
 '''
 origins = [
-    "*"
+    "*",
+    "http://localhost:4000",
+    "http://ec2-54-180-142-127.ap-northeast-2.compute.amazonaws.com:4000"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ["http://localhost:4000","*"],
+    allow_origins = origins,
     allow_credentials = True,
     allow_methods= ["*"],
     allow_headers = ["*"],
