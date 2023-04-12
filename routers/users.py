@@ -42,7 +42,7 @@ async def LoginUser(
         age_range = user_create["age_range"]
     )
     token = create_user(db = db, user = user)
-    response.set_cookie(key = "access_token", value = token)
+   # response.set_cookie(key = "access_token", value = token)
     #print(response.headers.get('access_token'))
     #print("is created")
     #response.status_code = 200
@@ -50,9 +50,8 @@ async def LoginUser(
     response.headers["Access-Control-Allow-Credentials"] = "*"
     response = JSONResponse(content={"access_token" : token})
     response.set_cookie(key = "access_token", value = token)
-    print(response)
+    print(response.headers)
     return response
-    #return token
 
    except Exception as e:
        return HTTPException(
@@ -110,7 +109,7 @@ async def check_user_data(
 ):
  #   print(access_token)i
     
-    print("headers",request.headers)
+    print("headers >>>>> ",request.headers)
     print("in cookie>?? >>>",request.cookies.get('access_token'))
     access_token = request.cookies.get('access_token')
     user_info = get_user_from_jwt(access_token, db=db)
@@ -138,3 +137,15 @@ async def check_user_qr(
             status_code=status.HTTP_401_UNAUTHORIZED,
              detail=str(e)
         )
+
+@router.get("/cookie")
+async def root(response : Response):
+    response.set_cookie(key="my_cookie", value="cookie_value")
+
+    return {"message" : "check my cookie"}
+
+@router.get("/cookie-check")
+async def root(request : Request):
+    print(request.headers)
+    
+    return {"message" : "내가 만든 쿠키"}
