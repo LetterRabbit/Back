@@ -11,7 +11,7 @@ algorithm = os.getenv("ALGORITHM")
 def get_user_from_jwt(access_token, db : Session):
     try:
         data = jwt.decode(token=access_token,algorithms=algorithm,key=secretkey)
-        
+        print(data)        
         if db.query(models.User).filter(models.User.id == data['id']).first() is None:
             raise Exception
         user = db.query(models.User).filter(models.User.id == data['id']).first()

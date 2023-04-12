@@ -1,6 +1,6 @@
 import requests
 import os
-from fastapi import APIRouter, Request, Response, HTTPException, Header, Depends,Cookie, status
+from fastapi import APIRouter, Request, Response, HTTPException, Header, Depends,Cookie, status, Cookie
 from api.user.login import create_user,get_token_data, get_dev_token_data
 from api.user.qr import save_aws_s3
 from fastapi.responses import JSONResponse
@@ -8,9 +8,11 @@ from core.decoration import get_user_from_jwt
 from sqlalchemy.orm import Session
 from sqlalchemy import MetaData, Table
 from core import database
-from typing import Optional
+from typing import Optional, Union
 from schemas import user_schemas
 from models import models
+from fastapi.responses import JSONResponse
+
 
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 secretkey = os.getenv("SECRET_KEY")
@@ -40,9 +42,17 @@ async def LoginUser(
         age_range = user_create["age_range"]
     )
     token = create_user(db = db, user = user)
-    response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
+    response.set_cookie(key = "access_token", value = token)
+    #print(response.headers.get('access_token'))
+    #print("is created")
+    #response.status_code = 200
+    #response.content = "login_success"
     response.headers["Access-Control-Allow-Credentials"] = "*"
-    return JSONResponse(content={"access_token" : token}, status_code=200)
+    response = JSONResponse(content={"access_token" : token})
+    response.set_cookie(key = "access_token", value = token)
+    print(response)
+    return response
+    #return token
 
    except Exception as e:
        return HTTPException(
@@ -95,10 +105,15 @@ async def kakaoAuth(response: Response, code: Optional[str]="NONE",    db : Sess
 @router.get("/me")
 async def check_user_data(
     request : Request,
-    db : Session = Depends(database.get_db)
+    db : Session = Depends(database.get_db),
+#    access_token: Optional[str] = Cookie(None)
 ):
-    token = request.headers.get('access_token')
-    user_info = get_user_from_jwt(token, db=db)
+ #   print(access_token)i
+    
+    print("headers",request.headers)
+    print("in cookie>?? >>>",request.cookies.get('access_token'))
+    access_token = request.cookies.get('access_token')
+    user_info = get_user_from_jwt(access_token, db=db)
 
     return user_info
 
