@@ -17,8 +17,10 @@ def get_user_from_jwt(access_token, db : Session):
         user = db.query(models.User).filter(models.User.id == data['id']).first()
         return user
     
-    except ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    except ExpiredSignatureError as a:
+        raise HTTPException(status_code=400, detail=str(a))
+    
+
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail= str(e))
     

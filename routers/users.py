@@ -8,11 +8,9 @@ from core.decoration import get_user_from_jwt
 from sqlalchemy.orm import Session
 from sqlalchemy import MetaData, Table
 from core import database
-from typing import Optional, Union
+from typing import Optional
 from schemas import user_schemas
 from models import models
-from fastapi.responses import JSONResponse
-
 
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 secretkey = os.getenv("SECRET_KEY")
@@ -42,16 +40,15 @@ async def LoginUser(
         age_range = user_create["age_range"]
     )
     token = create_user(db = db, user = user)
-   # response.set_cookie(key = "access_token", value = token)
-    #print(response.headers.get('access_token'))
-    #print("is created")
-    #response.status_code = 200
-    #response.content = "login_success"
-    response.headers["Access-Control-Allow-Credentials"] = "*"
-    response = JSONResponse(content={"access_token" : token})
-    response.set_cookie(key = "access_token", value = token)
-    print(response.headers)
-    return response
+    response.set_cookie(key = "access_token", value=token)
+    # response.headers["Access-Control-Allow-Credentials"] = "*"
+    # response.body("login_success")
+    # print("login success")
+    # response.status_code = 200
+    # response.body = "login success"
+    return JSONResponse(content={"access_token" : token}, status_code=200)
+    # response.status_code = status.HTTP_200_OK
+    # return token
 
    except Exception as e:
        return HTTPException(
@@ -104,15 +101,13 @@ async def kakaoAuth(response: Response, code: Optional[str]="NONE",    db : Sess
 @router.get("/me")
 async def check_user_data(
     request : Request,
-    db : Session = Depends(database.get_db),
-#    access_token: Optional[str] = Cookie(None)
+    db : Session = Depends(database.get_db)
 ):
- #   print(access_token)i
-    
-    print("headers >>>>> ",request.headers)
-    print("in cookie>?? >>>",request.cookies.get('access_token'))
-    access_token = request.cookies.get('access_token')
-    user_info = get_user_from_jwt(access_token, db=db)
+    print("header>>>>>",request.headers)
+    print("cookie>>>>>", request.cookies.get('access_token'))
+    request.headers.items()
+    token = request.cookies.get('access_token')
+    user_info = get_user_from_jwt(token, db=db)
 
     return user_info
 
@@ -137,15 +132,3 @@ async def check_user_qr(
             status_code=status.HTTP_401_UNAUTHORIZED,
              detail=str(e)
         )
-
-@router.get("/cookie")
-async def root(response : Response):
-    response.set_cookie(key="my_cookie", value="cookie_value")
-
-    return {"message" : "check my cookie"}
-
-@router.get("/cookie-check")
-async def root(request : Request):
-    print(request.headers)
-    
-    return {"message" : "내가 만든 쿠키"}
