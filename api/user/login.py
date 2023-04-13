@@ -16,19 +16,24 @@ REDIRECT_URI = "http://localhost:8000/users/callback"
 
 
 def connect_kakao_server(authCode):
-    url = "https://kauth.kakao.com/oauth/token"
-    header = {
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    data = {
-        "code" : authCode,
-        "client_id" : KAKAO_REST_API_KEY,
-        "grant_type" : "authorization_code"
+    try:
+        url = "https://kauth.kakao.com/oauth/token"
+        header = {
+            "Content-Type": "application/x-www-form-urlencoded"
         }
-    a = requests.post(url=url, headers=header,data=data)
-    res = a.json()
-
-    return res
+        data = {
+            "code" : authCode,
+            "client_id" : KAKAO_REST_API_KEY,
+            "grant_type" : "authorization_code"
+            }
+        a = requests.post(url=url, headers=header,data=data)
+        res = a.json()
+        return res
+    except Exception as e:
+        return HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
 
 def create_access_token(data : dict, expires_delta : timedelta or None = None):
     to_encode = data.copy()
