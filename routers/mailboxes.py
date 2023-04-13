@@ -22,7 +22,7 @@ async def CreateMailbox(
     data : CreateMailbox = Request.body
     ):
 
-    token = request.headers.get('access_token')
+    token = request.cookies.get('access_token')
     user_info = get_user_from_jwt(token, db=db)
     
     mailbox_data = MailboxBase(
@@ -36,7 +36,7 @@ async def CreateMailbox(
 
 @router.get("/open", status_code= status.HTTP_200_OK)
 async def OpenMailbox(request : Request, db : Session = Depends(database.get_db)):
-    access_token = request.headers.get('access_token')
+    access_token = request.cookies.get('access_token')
     user_data = get_user_from_jwt(access_token= access_token, db= db)
     letters = open_my_mailbox(db = db, data = user_data)
     
@@ -44,7 +44,7 @@ async def OpenMailbox(request : Request, db : Session = Depends(database.get_db)
 
 @router.get("/open/{letter_id}", status_code= status.HTTP_200_OK)
 async def OpenLetter(request : Request, letter_id : int, db : Session = Depends(database.get_db)):
-    access_token = request.headers.get('access_token')
+    access_token = request.cookies.get('access_token')
     user_data = get_user_from_jwt(access_token= access_token, db= db)
     letter = open_my_letter(db=db, data= user_data, letter_id= letter_id)
     
