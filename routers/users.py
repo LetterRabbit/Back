@@ -41,14 +41,7 @@ async def LoginUser(
     )
     token = create_user(db = db, user = user)
     response.set_cookie(key = "access_token", value=token)
-    # response.headers["Access-Control-Allow-Credentials"] = "*"
-    # response.body("login_success")
-    # print("login success")
-    # response.status_code = 200
-    # response.body = "login success"
     return JSONResponse(content={"access_token" : token}, status_code=200)
-    # response.status_code = status.HTTP_200_OK
-    # return token
 
    except Exception as e:
        return HTTPException(
@@ -117,7 +110,7 @@ async def check_user_qr(
     db : Session = Depends(database.get_db)
     ):
     try:
-        token = request.headers.get('access_token')
+        token = request.cookies.get('access_token')
         user_info = get_user_from_jwt(token, db=db)
         data = db.query(models.MailBox).filter(models.MailBox.owner_id == user_info.id).first()
         url = f"{request.base_url}mailbox/{data.address}"
