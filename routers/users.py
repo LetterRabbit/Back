@@ -11,6 +11,8 @@ from core import database
 from typing import Optional
 from schemas import user_schemas
 from models import models
+from core.log import LOG
+
 
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 secretkey = os.getenv("SECRET_KEY")
@@ -44,6 +46,7 @@ async def LoginUser(
     return JSONResponse(content={"access_token" : token}, status_code=200)
 
    except Exception as e:
+       LOG.error(str(e))
        return HTTPException(
            status_code=401,
            detail=str(e)
@@ -121,6 +124,7 @@ async def check_user_qr(
         return JSONResponse(content={"self_domain" : user_info.self_domain, "qr_domain" : user_info.qr_code}, status_code=201)
 
     except Exception as e:
+        LOG.error(str(e))
         return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
              detail=str(e)
