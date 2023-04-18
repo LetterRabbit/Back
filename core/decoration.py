@@ -4,7 +4,7 @@ from jose.exceptions import ExpiredSignatureError
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from models import models
-
+from core.log import LOG
 secretkey = os.getenv("SECRET_KEY")
 algorithm = os.getenv("ALGORITHM")
 
@@ -18,10 +18,12 @@ def get_user_from_jwt(access_token, db : Session):
         return user
     
     except ExpiredSignatureError as a:
+        LOG.error(str(e))
         raise HTTPException(status_code=400, detail=str(a))
     
 
     except Exception as e:
+        LOG.error(str(e))
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail= str(e))
     
 

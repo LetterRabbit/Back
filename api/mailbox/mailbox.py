@@ -6,6 +6,8 @@ from models.models import User, MailBoxPosition, Letter, MailBox
 
 from sqlalchemy.orm.exc import NoResultFound
 
+from core.log import LOG
+
 def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase ):
     print('create_my_mailbox 작동')
 
@@ -45,8 +47,10 @@ def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase )
         db.refresh(new_mailbox)
 
     except KeyError:
+        LOG.error(str(e))
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= "Key value that does not exist.")
     except Exception as e:
+        LOG.error(str(e))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "[create_my_mailbox error] : "+ str(e))
     
 def open_my_mailbox(db : Session, data):
@@ -58,6 +62,7 @@ def open_my_mailbox(db : Session, data):
         
         return letters
     except Exception as e :
+        LOG.error(str(e))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
     
 def open_my_letter(db : Session, data, letter_id):
@@ -71,6 +76,8 @@ def open_my_letter(db : Session, data, letter_id):
         
         return letters
     except NoResultFound as e:
+        LOG.error(str(e))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "NoResultFound " +": " + str(e))
     except Exception as e :
+        LOG.error(str(e))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))

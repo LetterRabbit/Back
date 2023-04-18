@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from jose import jwt
 from datetime import datetime, timedelta
-
+from core.log import LOG
 
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 secretkey = os.getenv("SECRET_KEY")
@@ -30,6 +30,7 @@ def connect_kakao_server(authCode):
         res = a.json()
         return res
     except Exception as e:
+        LOG.error("kakao connect error : ", str(e))
         return HTTPException(
             status_code=400,
             detail=str(e)

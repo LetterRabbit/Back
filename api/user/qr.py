@@ -3,7 +3,7 @@ import boto3
 import os, uuid
 from botocore.exceptions import ClientError
 from pathlib import Path
-
+from core.log import LOG
 AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
 
@@ -33,5 +33,7 @@ def save_aws_s3(url, id):
         return s3_url
     
     except Exception as e:
+        
         os.remove(f"{os.getcwd()}/api/user/image/{id}.png")
+        LOG.error(f"{os.getcwd()}/api/user/image/{id}.png is deleted : ", str(e) )
         return {'message': f'Failed to upload image to S3\n{e}'}
