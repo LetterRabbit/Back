@@ -30,9 +30,9 @@ async def LoginUser(
     response: Response,
     request : Request,
     db : Session = Depends(database.get_db),
+    authCode: str = Header(None, description="Token for authentication with Kakao API")
 ):
    try:
-    authCode = request.headers.get("authCode")
     user_create = get_token_data(authCode)
     user = user_schemas.UserCreate(
         username = user_create["username"],

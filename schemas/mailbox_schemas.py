@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+from bson import ObjectId
 
 class MailboxBase(BaseModel): 
     owner_id : int
@@ -13,3 +14,5 @@ class MailboxCreate(MailboxBase):
 class CreateMailbox(BaseModel):
     mailbox_position_id : int
     name : str
+    class Config:
+        json_encoders = {ObjectId: str}
