@@ -11,8 +11,9 @@ class MailboxBase(BaseModel):
 class MailboxCreate(MailboxBase):
     address : str
 
-class CreateMailbox(BaseModel):
+class PostCreateMailbox(BaseModel):
     mailbox_position_id : int
     name : str
     class Config:
         json_encoders = {ObjectId: str}
+

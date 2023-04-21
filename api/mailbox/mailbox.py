@@ -2,10 +2,10 @@ import requests, json, os, uuid
 from fastapi import Depends, HTTPException, status
 from schemas import mailbox_schemas
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from models.models import User, MailBoxPosition, Letter, MailBox
 
 from sqlalchemy.orm.exc import NoResultFound
-
 from core.log import LOG
 
 def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase ):
@@ -58,9 +58,17 @@ def open_my_mailbox(db : Session, data):
     try:
         user_id = data.id
         target_mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).scalar()
-        letters = db.query(Letter.id, Letter.username, Letter.description, Letter.created_at).filter(Letter.mailbox_id == target_mailbox_id).all()
-        
-        return letters
+        rows = db.query(
+            Letter.id, 
+            Letter.username, 
+            Letter.description, 
+            func.DATE_FORMAT(Letter.created_at, '%Y-%m-%d').label('created_date')
+        ).filter(Letter.mailbox_id == target_mailbox_id).all()
+
+        result = [{key: value for key, value in zip(row.keys(), row)} for row in rows]
+
+        return result
+    
     except Exception as e :
         LOG.error(str(e))
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
@@ -69,9 +77,14 @@ def open_my_letter(db : Session, data, letter_id):
     try:
         user_id = data.id
         target_mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).scalar()
-        letters = db.query(Letter.id, Letter.username, Letter.description, Letter.created_at).filter(
-            Letter.id == letter_id,
-            Letter.mailbox_id == target_mailbox_id
+        letters = db.query(
+            Letter.id, 
+            Letter.username, 
+            Letter.description, 
+            func.DATE_FORMAT(Letter.created_at, '%Y-%m-%d').label('created_date')
+            ).filter(
+                Letter.id == letter_id,
+                Letter.mailbox_id == target_mailbox_id
             ).one()
         
         return letters
