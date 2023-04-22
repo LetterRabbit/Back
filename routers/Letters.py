@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Response, Header, Depends, status, Query
+from fastapi import APIRouter, Request, Response, Body, Depends, status, Query
 from sqlalchemy.orm import Session
 from api.letter.letter import write_my_letter
 from typing import Optional
@@ -16,9 +16,9 @@ async def CheckGet2():
 
 @router.post("/write/", status_code= status.HTTP_201_CREATED)
 async def CreateMailbox(
-    address : str = Query(None, title='mailbox_address(uuid)', description= '쿼리 스트링으로 메일박스 uuid 값이 필요합니다.'),
+    address : str = Query(None, title='mailbox_address(uuid)', description= 'The UUID value for the mailbox is required as a query string.'),
     db : Session = Depends(database.get_db), 
-    data : RequestLetter = Request.body):
+    data : RequestLetter = Body()):
     
     letter_data = WriteLetter(
         address= address,
