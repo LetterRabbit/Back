@@ -1,6 +1,5 @@
-# Back
-
-실행방법
+# Backㅌ
+실행방법 (shell script 제작중)
 
 
 사전준비
