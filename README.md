@@ -1,4 +1,4 @@
-# Backㅌ
+# Back
 실행방법 (shell script 제작중)
 
 
