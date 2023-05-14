@@ -46,3 +46,11 @@ async def OpenLetter(request : Request, letter_id : int, db : Session = Depends(
     letter = open_my_letter(db=db, data= user_data, letter_id= letter_id)
 
     return JSONResponse(content= dict(letter), status_code=200)
+
+# @router.get("/gen")
+# async def GenerateMockData(request : Request, db : Session = Depends(database.get_db)):
+#     access_token = request.cookies.get('access_token')
+#     user_data = get_user_from_jwt(access_token= access_token, db= db)
+    
+
+#     return {"print" : user_data}
