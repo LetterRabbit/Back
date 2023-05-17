@@ -97,24 +97,25 @@ async def kakaoAuth(response: Response, code: Optional[str]="NONE",    db : Sess
 @router.get("/me")
 async def check_user_data(
     request : Request,
-    db : Session = Depends(database.get_db)
+    db : Session = Depends(database.get_db),
+    access : Optional[str] = Header(None)
 ):
-    print("header>>>>>",request.headers)
-    print("cookie>>>>>", request.cookies.get('access_token'))
-    request.headers.items()
-    token = request.cookies.get('access_token')
-    user_info = get_user_from_jwt(token, db=db)
+    #print("header>>>>>",request.headers)
+    #print("cookie>>>>>", request.cookies.get('access_token'))
+    #print(request.headers.items())
+    #token = request.headers.get('access_token')
+    user_info = get_user_from_jwt(access_token = access, db=db)
 
     return user_info
 
 @router.get('/qr')
 async def check_user_qr(
     request : Request,
-    db : Session = Depends(database.get_db)
+    db : Session = Depends(database.get_db),
+    access : Optional[str] = Header(None)
     ):
     try:
-        token = request.cookies.get('access_token')
-        user_info = get_user_from_jwt(token, db=db)
+        user_info = get_user_from_jwt(access, db=db)
         data = db.query(models.MailBox).filter(models.MailBox.owner_id == user_info.id).first()
         url = f"{request.base_url}mailbox/{data.address}"
         url_qr = save_aws_s3(url, user_info.id)

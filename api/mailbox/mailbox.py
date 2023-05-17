@@ -46,12 +46,12 @@ def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase )
         db.commit()
         db.refresh(new_mailbox)
 
-    except KeyError:
+    except KeyError as e:
         LOG.error(str(e))
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= "Key value that does not exist.")
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= "Key value that does not exist.")
     except Exception as e:
         LOG.error(str(e))
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "[create_my_mailbox error] : "+ str(e))
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "[create_my_mailbox error] : "+ str(e))
     
 def open_my_mailbox(db : Session, data):
     print('open_my_mailbox 작동')
@@ -71,7 +71,7 @@ def open_my_mailbox(db : Session, data):
     
     except Exception as e :
         LOG.error(str(e))
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
     
 def open_my_letter(db : Session, data, letter_id):
     try:
@@ -90,7 +90,7 @@ def open_my_letter(db : Session, data, letter_id):
         return letters
     except NoResultFound as e:
         LOG.error(str(e))
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "NoResultFound " +": " + str(e))
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "NoResultFound " +": " + str(e))
     except Exception as e :
         LOG.error(str(e))
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
