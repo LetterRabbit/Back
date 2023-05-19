@@ -45,3 +45,17 @@ def write_my_letter(db : Session, letter_data : letter_schemas.WriteLetter ):
     db.add(new_letter)
     db.commit()
     db.refresh(new_letter)
+
+def write_mock_letter(db : Session, letter_data : letter_schemas.WriteLetter ):
+    mailbox_id = find_mailbox(db = db, target_address = letter_data.address)
+    username = generate_random_writer_name(name = letter_data.username)
+    
+    new_letter = Letter(
+        mailbox_id = mailbox_id,
+        username = username,
+        description = letter_data.description
+    )
+
+    db.add(new_letter)
+    db.commit()
+    db.refresh(new_letter)
