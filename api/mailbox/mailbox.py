@@ -1,11 +1,15 @@
-import requests, json, os, uuid
+import requests, json, os, uuid, smtplib
 from fastapi import Depends, HTTPException, status
 from schemas import mailbox_schemas
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from models.models import User, MailBoxPosition, Letter, MailBox
 
+from email.mime.text import MIMEText
+
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import SQLAlchemyError
+
 from core.log import LOG
 
 def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase ):
@@ -94,3 +98,22 @@ def open_my_letter(db : Session, data, letter_id):
     except Exception as e :
         LOG.error(str(e))
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
+
+async def send_email_async(report_letter):
+    with smtplib.SMTP('smtp.gmail.com') as smtp:
+        smtp.starttls()
+        smtp.login('letter4yous2@gmail.com', 'xqagjxmlxpbmlwqe')
+
+        msg = MIMEText(f'letter_id : {report_letter.id}, username : {report_letter.username}, letter_description : {report_letter.description}')
+        msg['Subject'] = '신고가 접수된 편지입니다.'
+
+        smtp.sendmail('letter4yous2@gmail.com', 'letter4yous2@gmail.com', msg.as_string())
+
+async def get_mailbox_id(user_id: int, db: Session) -> int:
+    try:
+        mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).first()[0]
+        return mailbox_id
+    except NoResultFound:
+        return None
+    except SQLAlchemyError as e:
+        return None

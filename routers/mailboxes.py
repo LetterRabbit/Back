@@ -1,6 +1,6 @@
 from fastapi                    import APIRouter, Request, Response, Body, Depends, status, Header
 from sqlalchemy.orm             import Session
-from api.mailbox.mailbox        import create_my_mailbox, open_my_mailbox, open_my_letter
+from api.mailbox.mailbox        import create_my_mailbox, open_my_mailbox, open_my_letter, send_email_async, get_mailbox_id
 from core.decoration            import get_user_from_jwt
 from core                       import database
 from schemas.mailbox_schemas    import PostCreateMailbox, MailboxBase
@@ -9,6 +9,7 @@ from fastapi.encoders           import jsonable_encoder
 from typing                     import Optional
 
 from models.models import MailBox, Letter
+
 
 router = APIRouter(
     prefix="/mailbox",
@@ -60,6 +61,23 @@ async def OpenLetter(
     letter = open_my_letter(db=db, data= user_data, letter_id= letter_id)
 
     return JSONResponse(content= dict(letter), status_code=200)
+
+@router.post("/report/{letter_id}")
+async def ReportLetter(request: Request, letter_id: int, db: Session = Depends(database.get_db), access: Optional[str] = Header(None)):
+    user_data = get_user_from_jwt(access_token = access, db = db)
+    user_id = user_data.id
+
+    mailbox_id = await get_mailbox_id(user_id, db)
+    if not mailbox_id:
+        return JSONResponse(content="Mailbox not found", status_code=404)
+
+    report_letter = db.query(Letter).filter(Letter.id == letter_id, Letter.mailbox_id == mailbox_id).first()
+    if not report_letter:
+        return JSONResponse(content="Letter not found", status_code=404)
+
+    await send_email_async(report_letter)
+
+    return JSONResponse(content = "Report has been filed.", status_code = 200)
 
 @router.get("/gen")
 async def GenerateMockData(request : Request, db : Session = Depends(database.get_db), access : Optional[str] = Header(None)):
