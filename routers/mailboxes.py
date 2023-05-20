@@ -5,9 +5,10 @@ from core.decoration            import get_user_from_jwt
 from core                       import database
 from schemas.mailbox_schemas    import PostCreateMailbox, MailboxBase
 from fastapi.responses          import JSONResponse
-from bson                       import ObjectId
 from fastapi.encoders           import jsonable_encoder
 from typing                     import Optional
+
+from models.models import MailBox, Letter
 
 router = APIRouter(
     prefix="/mailbox",
@@ -60,10 +61,21 @@ async def OpenLetter(
 
     return JSONResponse(content= dict(letter), status_code=200)
 
-# @router.get("/gen")
-# async def GenerateMockData(request : Request, db : Session = Depends(database.get_db)):
-#     access_token = request.cookies.get('access_token')
-#     user_data = get_user_from_jwt(access_token= access_token, db= db)
+@router.get("/gen")
+async def GenerateMockData(request : Request, db : Session = Depends(database.get_db), access : Optional[str] = Header(None)):
+    user_data = get_user_from_jwt(access_token= access, db= db)
+    user_id = user_data.id
+    mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).first()[0]
     
+    new_letter = Letter(
+        mailbox_id = mailbox_id,
+        username = 'test_generate',
+        description = '테스트로 생성된 편지입니다.'
+    )
 
-#     return {"print" : user_data}
+    db.add(new_letter)
+    db.commit()
+    db.refresh(new_letter)
+    
+    return new_letter
+
