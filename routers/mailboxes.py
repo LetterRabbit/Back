@@ -41,11 +41,13 @@ async def create_mailbox(
 @router.get("/open")
 async def OpenMailbox(
         request: Request, 
-        db: Session = Depends(database.get_db),
-        access : Optional[str] = Header(None)
+        db : Session = Depends(database.get_db),
+        access : Optional[str] = Header(None),
+        skip : int = 0,
+        limit : int = 5
         ):
     user_data = get_user_from_jwt(access_token=access, db=db)
-    all_letters = open_my_mailbox(db=db, data=user_data)
+    all_letters = open_my_mailbox(db=db, data = user_data, skip = skip, limit = limit )
 
     return JSONResponse(content= all_letters, status_code=200)
 
