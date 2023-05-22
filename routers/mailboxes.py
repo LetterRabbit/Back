@@ -1,4 +1,4 @@
-from fastapi                    import APIRouter, Request, Response, Body, Depends, status, Header
+from fastapi                    import APIRouter, Request, Response, Body, Depends, status, Header, HTTPException
 from sqlalchemy.orm             import Session
 from api.mailbox.mailbox        import create_my_mailbox, open_my_mailbox, open_my_letter
 from core.decoration            import get_user_from_jwt
@@ -79,3 +79,23 @@ async def GenerateMockData(request : Request, db : Session = Depends(database.ge
     
     return new_letter
 
+@router.get("/delete/{letter_id}")
+async def DeleteLetter(request : Request, letter_id : int, db : Session = Depends(database.get_db), access : Optional[str] = Header(None)):
+    user_data = get_user_from_jwt(access_token = access, db = db)
+    user_id = user_data.id
+
+    mailbox = db.query(MailBox).filter(MailBox.owner_id == user_id).first()
+
+    if not mailbox:
+        raise HTTPException(status_code = 404, detail = "Mailbox does not exist")
+
+    delete_letter = db.query(Letter).filter(Letter.id == letter_id, Letter.mailbox_id == mailbox.id).first()
+    
+    if delete_letter:
+        db.delete(delete_letter)
+        db.commit()
+        db.refresh(delete_letter)
+
+        return JSONResponse(content = f"letter_id : {letter_id} has been deleted", status_code = 200)
+    else:
+        raise HTTPException(status_code = 404, detail = f"letter_id : {letter_id} does not exist")
