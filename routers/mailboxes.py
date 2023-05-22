@@ -1,4 +1,4 @@
-from fastapi                    import APIRouter, Request, Response, Body, Depends, status, Header
+from fastapi                    import APIRouter, Request, Response, Body, Depends, status, Header, Query
 from sqlalchemy.orm             import Session
 from api.mailbox.mailbox        import create_my_mailbox, open_my_mailbox, open_my_letter
 from core.decoration            import get_user_from_jwt
@@ -43,8 +43,8 @@ async def OpenMailbox(
         request: Request, 
         db : Session = Depends(database.get_db),
         access : Optional[str] = Header(None),
-        skip : int = 0,
-        limit : int = 5
+        skip : int = Query(0),
+        limit : int = Query(5)
         ):
     user_data = get_user_from_jwt(access_token=access, db=db)
     all_letters = open_my_mailbox(db=db, data = user_data, skip = skip, limit = limit )
