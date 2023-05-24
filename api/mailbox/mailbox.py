@@ -53,21 +53,27 @@ def create_my_mailbox(db : Session, mailbox_data : mailbox_schemas.MailboxBase )
         LOG.error(str(e))
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "[create_my_mailbox error] : "+ str(e))
     
-def open_my_mailbox(db : Session, data):
-    print('open_my_mailbox 작동')
+def open_my_mailbox(db : Session, data, skip, limit):
     try:
         user_id = data.id
         target_mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).scalar()
-        rows = db.query(
+        
+        mailbox_query = db.query(
             Letter.id, 
             Letter.username, 
             Letter.description, 
             func.DATE_FORMAT(Letter.created_at, '%Y-%m-%d').label('created_date')
-        ).filter(Letter.mailbox_id == target_mailbox_id).all()
+        ).filter(Letter.mailbox_id == target_mailbox_id)
+
+        print(type(mailbox_query))
+
+        total_count = mailbox_query.count()
+
+        rows = mailbox_query.offset(skip).limit(limit).all()
 
         result = [{key: value for key, value in zip(row.keys(), row)} for row in rows]
 
-        return result
+        return {"total_count" : total_count, "result" : result}
     
     except Exception as e :
         LOG.error(str(e))
