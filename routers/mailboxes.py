@@ -1,4 +1,4 @@
-from fastapi                    import APIRouter, Request, Response, Body, Depends, status, Header, HTTPException
+from fastapi                    import APIRouter, Request, Response, Body, Depends, status, Header, HTTPException, Query
 from sqlalchemy.orm             import Session
 from api.mailbox.mailbox        import create_my_mailbox, open_my_mailbox, open_my_letter, send_email_async, get_mailbox_id
 from core.decoration            import get_user_from_jwt
