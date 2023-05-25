@@ -17,9 +17,16 @@ router = APIRouter(
 )
 
 @router.get("/check")
-async def CheckGet():
-    print('mailbox activate')
-    return JSONResponse(content="mailbox activate", status_code=200)
+async def check_get(request: Request):
+    client_host = request.client.host
+    client_port = request.client.port
+    server_port = request.scope.get("server")[1]
+
+    return JSONResponse(content={
+        "IP": client_host,
+        "client Port": client_port,
+        "server Port": server_port
+    }, status_code=200)
 
 @router.post("/create")
 async def create_mailbox(
