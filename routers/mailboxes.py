@@ -42,9 +42,11 @@ async def create_mailbox(
         mailbox_position_id = data.mailbox_position_id,
         name = data.name
     )
-    create_my_mailbox(db=db, mailbox_data=mailbox_data)
 
-    return JSONResponse(content="Create mail box", status_code=201)
+    mailbox_query =  create_my_mailbox(db=db, mailbox_data=mailbox_data)
+    
+    if mailbox_query:
+        return JSONResponse(content="Create mail box", status_code=201)
 
 @router.get("/open")
 async def OpenMailbox(
