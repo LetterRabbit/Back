@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 DB_USERNAME = os.getenv("DB_USERNAME")
@@ -22,5 +22,12 @@ def get_db():
     db = SessionLocal()
     try: 
         yield db
+    finally:
+        db.close()
+
+def get_test_db():
+    db = SessionLocal()
+    try:
+        return db
     finally:
         db.close()
