@@ -12,7 +12,7 @@ from typing import Optional
 from schemas import user_schemas
 from models import models
 from core.log import LOG
-
+from models.models  import MailBox
 
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 secretkey = os.getenv("SECRET_KEY")
@@ -41,9 +41,14 @@ async def LoginUser(
         gender = user_create["gender"],
         age_range = user_create["age_range"]
     )
-    token = create_user(db = db, user = user)
-    response.set_cookie(key = "access_token", value=token)
-    return JSONResponse(content={"access_token" : token}, status_code=200)
+    token, user = create_user(db = db, user = user)
+    address = db.query(MailBox.address).filter(MailBox.owner_id == user).first()[0]
+    data = {
+        "access_token" : token,
+        "letter_data": address if len(address) < 1 else None
+        }
+    # response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
+    return JSONResponse(content=data, status_code=200)
 
    except Exception as e:
        LOG.error(str(e))
@@ -80,9 +85,14 @@ def dev_kakao_login(
             gender = user_create["gender"],
             age_range = user_create["age_range"]
         )
-    token = create_user(db = db, user = user)
-    response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
-    return token
+    token, user = create_user(db = db, user = user)
+    address = db.query(MailBox.address).filter(MailBox.owner_id == user).first()[0]
+    data = {
+        "access_token" : token,
+        "letter_data": address if len(address) < 1 else None
+        }
+    # response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
+    return JSONResponse(content=data, status_code=200)
 
 
 @router.get('/callback')
