@@ -1,9 +1,9 @@
 # Base image
 FROM python:3.10
 
-WORKDIR /Back
+WORKDIR /Back/
 
-COPY ./main.py /Back/
+COPY ./ /Back/
 COPY ./requirements.txt /Back/
 
 RUN pip install --upgrade pip
