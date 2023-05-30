@@ -94,7 +94,7 @@ def create_user(db : Session, user : user_schemas.UserCreate):
             "username" : data.username,
         }
         token = create_access_token(data=token_data)
-        return token
+        return token, data.id
     
 def get_dev_token_data(authCode):
     user_data = authCode
