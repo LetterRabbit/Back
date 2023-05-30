@@ -8,7 +8,7 @@ from fastapi.responses          import JSONResponse
 from fastapi.encoders           import jsonable_encoder
 from typing                     import Optional
 
-from models.models import MailBox, Letter
+from models.models              import MailBox, Letter
 
 
 router = APIRouter(
@@ -42,9 +42,11 @@ async def create_mailbox(
         mailbox_position_id = data.mailbox_position_id,
         name = data.name
     )
-    create_my_mailbox(db=db, mailbox_data=mailbox_data)
 
-    return JSONResponse(content="Create mail box", status_code=201)
+    mailbox_query =  create_my_mailbox(db=db, mailbox_data=mailbox_data)
+    
+    if mailbox_query:
+        return JSONResponse(content="Create mail box", status_code=201)
 
 @router.get("/open")
 async def OpenMailbox(
@@ -86,7 +88,7 @@ async def ReportLetter(request: Request, letter_id: int, db: Session = Depends(d
 
     await send_email_async(report_letter)
 
-    return JSONResponse(content = "Report has been filed.", status_code = 200)
+    return JSONResponse(content = "Report has been success.", status_code = 200)
 
 @router.get("/gen")
 async def GenerateMockData(request : Request, db : Session = Depends(database.get_db), access : Optional[str] = Header(None)):
@@ -121,7 +123,6 @@ async def DeleteLetter(request : Request, letter_id : int, db : Session = Depend
     if delete_letter:
         db.delete(delete_letter)
         db.commit()
-        db.refresh(delete_letter)
 
         return JSONResponse(content = f"letter_id : {letter_id} has been deleted", status_code = 200)
     else:
