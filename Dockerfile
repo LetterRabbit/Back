@@ -9,8 +9,11 @@ COPY ./requirements.txt /Back/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-EXPOSE 8000 8001 8002
+EXPOSE 8000 
+EXPOSE 8001 
+EXPOSE 8002
 
-CMD uvicorn --host 0.0.0.0 --port 8000 --workers 4 main:app && \
-    uvicorn --host 0.0.0.0 --port 8001 --workers 4 main:app && \
-    uvicorn --host 0.0.0.0 --port 8002 --workers 4 main:app
+CMD gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker \ 
+    --bind 0.0.0.0:8000 \
+    --bind 0.0.0.0:8001 \
+    --bind 0.0.0.0:8002
