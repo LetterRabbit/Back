@@ -1,13 +1,12 @@
 # Base image
-FROM python:3.10
+FROM --platform=linux/amd64 python:3.10
 
 WORKDIR /Back/
 
 COPY ./ /Back/
 COPY ./requirements.txt /Back/
 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip installn -r requirements.txt
 
 EXPOSE 8000 
 EXPOSE 8001 
