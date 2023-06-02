@@ -14,6 +14,6 @@ EXPOSE 8004
 EXPOSE 8005
 
 CMD gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker \ 
-    --bind 127.0.0.1:8003 \
-    --bind 127.0.0.1:8004 \
-    --bind 127.0.0.1:8005
+    --bind 0.0.0.0:8003 \
+    --bind 0.0.0.0:8004 \
+    --bind 0.0.0.0:8005
