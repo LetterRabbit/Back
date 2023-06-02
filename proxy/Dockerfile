@@ -1,9 +1,7 @@
 # Base image
 FROM --platform=linux/amd64 nginx
 
-WORKDIR /Back/proxy/
-
-COPY nginx.conf /Back/proxy/
+COPY letterbox.conf /etc/nginx/conf.d
 
 EXPOSE 80
 
