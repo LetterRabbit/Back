@@ -9,11 +9,11 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 COPY ./ /Back/
 
-EXPOSE 8003 
-EXPOSE 8004 
-EXPOSE 8005
+EXPOSE 8000 
+EXPOSE 8001 
+EXPOSE 8002
 
 CMD gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker \ 
-    --bind 0.0.0.0:8003 \
-    --bind 0.0.0.0:8004 \
-    --bind 0.0.0.0:8005
+    --bind 0.0.0.0:8000 \
+    --bind 0.0.0.0:8001 \
+    --bind 0.0.0.0:8002
