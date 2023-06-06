@@ -1,10 +1,19 @@
-FROM python:latest
+# Base image
+FROM --platform=linux/amd64 python:3.10
 
-WORKDIR /app/
+WORKDIR /Back/
 
-COPY ./main.py /app/
-COPY ./requirements.txt /app/
+COPY ./requirements.txt /Back/
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip && pip install -r requirements.txt
 
-RUN pip install -r requirements.txt
+COPY ./ /Back/
 
-CMD uvicorn --host=0.0.0.0 --port 8000 main:app
+EXPOSE 8003 
+EXPOSE 8004 
+EXPOSE 8005
+
+CMD gunicorn main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker \ 
+    --bind 0.0.0.0:8003 \
+    --bind 0.0.0.0:8004 \
+    --bind 0.0.0.0:8005
