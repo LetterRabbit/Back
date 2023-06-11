@@ -4,6 +4,7 @@ from api.letter.letter import write_my_letter
 from typing import Optional
 from core import database
 from schemas.letter_schemas import RequestLetter, WriteLetter
+from models.models import MailBox, User
 router = APIRouter(
     prefix="/letter",
     tags=["letter"],
@@ -13,6 +14,18 @@ router = APIRouter(
 async def CheckGet2():
     print('letter activate')
     return {"message" : "letter activate"}
+
+@router.post("/get/", status_code= status.HTTP_201_CREATED)
+async def CreateMailbox(
+    address : str = Query(None, title='mailbox_address(uuid)', description= 'The UUID value for the mailbox is required as a query string.'),
+    db : Session = Depends(database.get_db), 
+):
+    res = db.query(MailBox).filter(MailBox.address == address).first()
+    target_user = db.query(User).filter(User.id == res.owner_id).first()
+
+    
+    return Response(content=target_user.username)
+
 
 @router.post("/write/", status_code= status.HTTP_201_CREATED)
 async def CreateMailbox(
