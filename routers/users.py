@@ -83,10 +83,8 @@ def dev_kakao_login(
             age_range = user_create["age_range"]
         )
     token, user = create_user(db = db, user = user)
-    address = db.query(MailBox.address).filter(MailBox.owner_id == user).first()[0]
     data = {
         "access_token" : token,
-        "letter_data": address if len(address) < 1 else None
         }
     # response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
     return JSONResponse(content=data, status_code=200)
