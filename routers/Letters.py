@@ -15,7 +15,7 @@ async def CheckGet2():
     print('letter activate')
     return {"message" : "letter activate"}
 
-@router.post("/get/", status_code= status.HTTP_201_CREATED)
+@router.get("/write", status_code= status.HTTP_201_CREATED)
 async def CreateMailbox(
     address : str = Query(None, title='mailbox_address(uuid)', description= 'The UUID value for the mailbox is required as a query string.'),
     db : Session = Depends(database.get_db), 
@@ -27,7 +27,7 @@ async def CreateMailbox(
     return Response(content=target_user.username)
 
 
-@router.post("/write/", status_code= status.HTTP_201_CREATED)
+@router.post("/write", status_code= status.HTTP_201_CREATED)
 async def CreateMailbox(
     address : str = Query(None, title='mailbox_address(uuid)', description= 'The UUID value for the mailbox is required as a query string.'),
     db : Session = Depends(database.get_db), 
