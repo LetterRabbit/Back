@@ -52,8 +52,9 @@ async def create_mailbox(
     mytable = Table('users', MetaData(), autoload=True, autoload_with=database.engine)
     qr = mytable.update().where(mytable.c.id == user_info.id).values(self_domain = url, qr_code = url_qr)
     database.engine.execute(qr)
+
     if mailbox_query:
-        return JSONResponse(content="Create mail box", status_code=201)
+        return JSONResponse(content=mailbox_query.address, status_code=201)
 
 @router.get("/open")
 async def OpenMailbox(
