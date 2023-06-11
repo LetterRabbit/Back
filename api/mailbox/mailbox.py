@@ -97,7 +97,9 @@ def open_my_letter(db : Session, data, letter_id):
                 Letter.mailbox_id == target_mailbox_id
             ).one()
         
-        return letters
+        total_list = db.query(Letter.id).filter(Letter.mailbox_id == target_mailbox_id).values()
+        
+        return letters, total_list
     except NoResultFound as e:
         LOG.error(str(e))
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "NoResultFound " +": " + str(e))

@@ -77,9 +77,9 @@ async def OpenLetter(
         access : Optional[str] = Header(None)
         ):
     user_data = get_user_from_jwt(access_token= access, db= db)
-    letter = open_my_letter(db=db, data= user_data, letter_id= letter_id)
+    letter, total_list = open_my_letter(db=db, data= user_data, letter_id= letter_id)
 
-    return JSONResponse(content= dict(letter), status_code=200)
+    return JSONResponse(content= dict(letter, total_list), status_code=200)
 
 @router.post("/report/{letter_id}")
 async def ReportLetter(request: Request, letter_id: int, db: Session = Depends(database.get_db), access: Optional[str] = Header(None)):
