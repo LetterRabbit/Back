@@ -37,3 +37,20 @@ make_secret.sh 사용방법
 pip install 안될시 
 1.  python.exe -m pip install --upgrade pip 실행
 
+
+#### start_dev.sh 사용
+
+1. start_dev.sh.enc 복호화 (가상환경 및 env파일, 필요 python 패키지 설치를 위한 작업)
+    2-1. decrypt.sh를 통한 복호화 진행
+
+        - chmod 755 decrypt.sh
+        - source decrypt.sh
+
+
+    2-2. 권한 부여
+
+        - chmod 755 start_dev.sh
+
+    2-3. start_dev.sh 실행
+
+        - source start_dev.sh
