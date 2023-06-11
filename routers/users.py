@@ -1,7 +1,8 @@
 import requests
 import os
+from jose import jwt
 from fastapi import APIRouter, Request, Response, HTTPException, Header, Depends,Cookie, status, Cookie
-from api.user.login import create_user,get_token_data, get_dev_token_data
+from api.user.login import create_user,get_token_data, get_dev_token_data, verify_refresh_token, create_access_token
 from api.user.qr import save_aws_s3
 from fastapi.responses import JSONResponse
 from core.decoration import get_user_from_jwt
@@ -47,7 +48,7 @@ async def LoginUser(
         "access_token" : token,
         "letter_data": address if len(address) < 1 else None
         }
-    # response.set_cookie(key = "access_token", value=token, secure=True, httponly=True)
+
     return JSONResponse(content=data, status_code=200)
 
    except Exception as e:
@@ -110,10 +111,6 @@ async def check_user_data(
     db : Session = Depends(database.get_db),
     access : Optional[str] = Header(None)
 ):
-    #print("header>>>>>",request.headers)
-    #print("cookie>>>>>", request.cookies.get('access_token'))
-    #print(request.headers.items())
-    #token = request.headers.get('access_token')
     user_info = get_user_from_jwt(access_token = access, db=db)
 
     return user_info
@@ -139,4 +136,30 @@ async def check_user_qr(
         return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
              detail=str(e)
+        )
+
+
+@router.get('/token')
+async def check_user_refresh(
+    request : Request,
+    db : Session = Depends(database.get_db),
+    access : Optional[str] = Header(None)
+    ):
+    
+    try:
+        user_info = get_user_from_jwt(access_token = access, db=db)
+        if not verify_refresh_token(access):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token"
+            )
+        access_token = create_access_token(user_info)
+        return {
+            "access_token": access_token
+        }
+    except Exception as e:
+        LOG.error(e)
+        return HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
         )

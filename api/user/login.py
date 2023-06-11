@@ -41,7 +41,7 @@ def create_access_token(data : dict, expires_delta : timedelta or None = None):
     if expires_delta:
         expire = datetime.utcnow()+ expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(days=30)
     to_encode.update({"exp" : expire})
     encoded_jwt = jwt.encode(to_encode, secretkey, algorithm)
     return encoded_jwt
@@ -113,3 +113,21 @@ def get_dev_token_data(authCode):
         "birthday" : user_info['kakao_account']['birthday']
     }
     return data
+
+
+
+def verify_refresh_token(refresh_token: str):
+    try:
+        payload = jwt.decode(refresh_token, secretkey, algorithms=algorithm)
+        exp = payload.get("exp")
+        
+        if exp is None or datetime.utcnow() > datetime.fromtimestamp(exp):
+            return False
+        
+        # 추가적인 검증 로직을 수행할 수 있습니다.
+        # 예를 들어, 데이터베이스에서 사용자 정보를 확인하거나 추가적인 클레임을 검사할 수 있습니다.
+        
+        return True
+    
+    except jwt.JWTError:
+        return False
