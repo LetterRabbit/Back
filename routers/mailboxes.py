@@ -1,6 +1,8 @@
 from fastapi                    import APIRouter, Request, Response, Body, Depends, status, Header, HTTPException, Query
 from sqlalchemy.orm             import Session
+from sqlalchemy                 import Table, MetaData
 from api.mailbox.mailbox        import create_my_mailbox, open_my_mailbox, open_my_letter, send_email_async, get_mailbox_id
+from api.user.qr                import save_aws_s3
 from core.decoration            import get_user_from_jwt
 from core                       import database
 from schemas.mailbox_schemas    import PostCreateMailbox, MailboxBase
@@ -45,8 +47,14 @@ async def create_mailbox(
 
     mailbox_query =  create_my_mailbox(db=db, mailbox_data=mailbox_data)
     
+    url = f"https://letter-rabbit-client.vercel.app/mailbox/{mailbox_query.address}"
+    url_qr = save_aws_s3(url, user_info.id)
+    mytable = Table('users', MetaData(), autoload=True, autoload_with=database.engine)
+    qr = mytable.update().where(mytable.c.id == user_info.id).values(self_domain = url, qr_code = url_qr)
+    database.engine.execute(qr)
+
     if mailbox_query:
-        return JSONResponse(content="Create mail box", status_code=201)
+        return JSONResponse(content=mailbox_query.address, status_code=201)
 
 @router.get("/open")
 async def OpenMailbox(
@@ -69,9 +77,9 @@ async def OpenLetter(
         access : Optional[str] = Header(None)
         ):
     user_data = get_user_from_jwt(access_token= access, db= db)
-    letter = open_my_letter(db=db, data= user_data, letter_id= letter_id)
+    res = open_my_letter(db=db, data= user_data, letter_id= letter_id)
 
-    return JSONResponse(content= dict(letter), status_code=200)
+    return JSONResponse(content= res, status_code=200)
 
 @router.post("/report/{letter_id}")
 async def ReportLetter(request: Request, letter_id: int, db: Session = Depends(database.get_db), access: Optional[str] = Header(None)):
