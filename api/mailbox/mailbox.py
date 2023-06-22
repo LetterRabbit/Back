@@ -110,15 +110,8 @@ def open_my_letter(db : Session, data, letter_id):
         LOG.error(str(e))
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "open_my_mailbox error" + str(e))
 
-async def send_email_async(report_letter):
-    with smtplib.SMTP('smtp.gmail.com') as smtp:
-        smtp.starttls()
-        smtp.login('letter4yous2@gmail.com', 'xqagjxmlxpbmlwqe')
-
-        msg = MIMEText(f'letter_id : {report_letter.id}, username : {report_letter.username}, letter_description : {report_letter.description}')
-        msg['Subject'] = '신고가 접수된 편지입니다.'
-
-        smtp.sendmail('letter4yous2@gmail.com', 'letter4yous2@gmail.com', msg.as_string())
+# async def send_email_async(report_letter):
+    
 
 async def get_mailbox_id(user_id: int, db: Session) -> int:
     try:

@@ -1,7 +1,7 @@
 from fastapi                    import APIRouter, Request, Response, Body, Depends, status, Header, HTTPException, Query
 from sqlalchemy.orm             import Session
 from sqlalchemy                 import Table, MetaData
-from api.mailbox.mailbox        import create_my_mailbox, open_my_mailbox, open_my_letter, send_email_async, get_mailbox_id
+from api.mailbox.mailbox        import create_my_mailbox, open_my_mailbox, open_my_letter, get_mailbox_id
 from api.user.qr                import save_aws_s3
 from core.decoration            import get_user_from_jwt
 from core                       import database
@@ -11,7 +11,8 @@ from fastapi.encoders           import jsonable_encoder
 from typing                     import Optional
 
 from models.models              import MailBox, Letter
-
+import smtplib
+from email.mime.text import MIMEText
 
 router = APIRouter(
     prefix="/mailbox",
@@ -81,22 +82,40 @@ async def OpenLetter(
 
     return JSONResponse(content= res, status_code=200)
 
+
+class LetterForYouEmail:
+    def __init__(self):
+        self.default_email = 'letter4yous2@gmail.com'
+        self.mail_app_pwd  = 'xqagjxmlxpbmlwqe'
+
+    def send_email(self, data):
+        self.smtp = smtplib.SMTP('smtp.gmail.com', 587)
+        self.smtp.starttls()
+        self.smtp.login(self.default_email, self.mail_app_pwd)
+        
+        data = data
+        letter_id = data.id
+        letter_desc = data.description
+        self.text = f'[신고가 접수된 편지 ID] : {letter_id}\n[편지 내용] : {letter_desc}'
+
+        self.msg = MIMEText(self.text)
+
+        self.smtp.sendmail(self.default_email, self.default_email, self.msg.as_string())
+        self.smtp.quit()
+    
 @router.post("/report/{letter_id}")
-async def ReportLetter(request: Request, letter_id: int, db: Session = Depends(database.get_db), access: Optional[str] = Header(None)):
+def SendReportLetter(letter_id : int, db : Session = Depends(database.get_db), access : Optional[str] = Header(None) ):
     user_data = get_user_from_jwt(access_token = access, db = db)
     user_id = user_data.id
-
-    mailbox_id = await get_mailbox_id(user_id, db)
-    if not mailbox_id:
-        return JSONResponse(content="Mailbox not found", status_code=404)
-
-    report_letter = db.query(Letter).filter(Letter.id == letter_id, Letter.mailbox_id == mailbox_id).first()
-    if not report_letter:
-        return JSONResponse(content="Letter not found", status_code=404)
-
-    await send_email_async(report_letter)
-
-    return JSONResponse(content = "Report has been success.", status_code = 200)
+    user_mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).first()
+    
+    if not db.query(Letter.id).filter(Letter.mailbox_id == user_mailbox_id) == None:
+        report_letter_data = db.query(Letter).filter(Letter.id == letter_id).first()
+        letter_email = LetterForYouEmail()
+        letter_email.send_email(report_letter_data)
+        return JSONResponse(content = "reported", status_code = 200)
+    else:
+        return JSONResponse(content = "Report failed", status_code = 200)
 
 @router.get("/gen")
 async def GenerateMockData(request : Request, db : Session = Depends(database.get_db), access : Optional[str] = Header(None)):
