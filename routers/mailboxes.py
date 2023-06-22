@@ -107,9 +107,11 @@ class LetterForYouEmail:
 def SendReportLetter(letter_id : int, db : Session = Depends(database.get_db), access : Optional[str] = Header(None) ):
     user_data = get_user_from_jwt(access_token = access, db = db)
     user_id = user_data.id
-    user_mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).first()
-    
-    if not db.query(Letter.id).filter(Letter.mailbox_id == user_mailbox_id) == None:
+    print(user_id)
+    user_mailbox_id = db.query(MailBox.id).filter(MailBox.owner_id == user_id).first()[0]
+    print(user_mailbox_id)
+    letter_mailbox_id = db.query(Letter.mailbox_id).filter(Letter.id == letter_id).first()[0]
+    if user_mailbox_id == letter_mailbox_id:
         report_letter_data = db.query(Letter).filter(Letter.id == letter_id).first()
         letter_email = LetterForYouEmail()
         letter_email.send_email(report_letter_data)
