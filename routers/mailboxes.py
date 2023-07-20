@@ -9,7 +9,7 @@ from schemas.mailbox_schemas    import PostCreateMailbox, MailboxBase
 from fastapi.responses          import JSONResponse
 from fastapi.encoders           import jsonable_encoder
 from typing                     import Optional
-
+import json
 from models.models              import MailBox, Letter
 import smtplib
 from email.mime.text import MIMEText
@@ -79,8 +79,10 @@ async def OpenLetter(
         ):
     user_data = get_user_from_jwt(access_token= access, db= db)
     res = open_my_letter(db=db, data= user_data, letter_id= letter_id)
-
-    return JSONResponse(content= res, status_code=200)
+    
+    print(res)
+    
+    return JSONResponse(content=res, status_code=200)
 
 
 class LetterForYouEmail:

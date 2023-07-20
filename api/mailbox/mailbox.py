@@ -97,11 +97,20 @@ def open_my_letter(db : Session, data, letter_id):
                 Letter.mailbox_id == target_mailbox_id
             ).one()
         
-        total_list = db.query(Letter.id).filter(Letter.mailbox_id == target_mailbox_id).values()
+        total_list= []
+        total_list_query = db.query(Letter.id).filter(Letter.mailbox_id == target_mailbox_id).all()
+
+        for (letter_id,) in total_list_query:
+            total_list.append(letter_id)
+        
         res = {
-            "letters" : letters,
+            "id" : letters.id,
+            "username" : letters.username,
+            "desc" : letters.description,
+            "created_at": letters.created_date, 
             "total_list" : total_list
         }
+        
         return res
     except NoResultFound as e:
         LOG.error(str(e))
