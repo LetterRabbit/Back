@@ -42,3 +42,18 @@ async def CreateMailbox(
     write_my_letter(db= db, letter_data= letter_data)
     
     return {"message" : "new letter created"}
+
+@router.get("/open", status_code= status.HTTP_201_CREATED)
+async def CreateMailbox(
+    address : str = Query(None, title='mailbox_address(uuid)', description= 'The UUID value for the mailbox is required as a query string.'),
+    db : Session = Depends(database.get_db)):
+    
+    mailbox_query = db.query(MailBox).filter(MailBox.address == address).first()
+    
+    return_data = {
+        "user_name" : mailbox_query.owner.username,
+        "mailbox_position_id" : mailbox_query.mailbox_position_id,
+        "address" : mailbox_query.address,
+        "mailbox_name" :mailbox_query.name
+    }
+    return {"message" : return_data}
